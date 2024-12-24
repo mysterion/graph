@@ -16,7 +16,11 @@
             <div>
                 <textarea id="input-box" placeholder="edge list"></textarea>
                 <div class="margin-top">
-                    <input id="is-directed" type="checkbox">Directed</input>
+                    <div id="graph-type">
+                        <input type="radio" name="graph-type" value="edge list" checked>edge list</input>
+                        <input type="radio" name="graph-type" value="parent array">parent array</input>
+                    </div>
+                    <input id="is-directed" type="checkbox" class="margin-top">Directed</input>
                     <div id="error-box"></div>
                 </div>
             </div>

@@ -4,6 +4,7 @@ const errorBox = document.getElementById("error-box");
 const divider = document.getElementById("divider");
 const statusMsg = document.getElementById("status-message");
 const visualizer = document.getElementById("visualizer");
+const graphType = document.querySelector("#graph-type");
 let isResizing = false;
 
 
@@ -145,8 +146,21 @@ function drawGraph(g, isDirected = false, radius = 20) {
     }
 }
 
-
 function parseInput(txt) {
+    if (txt.trim().length === 0) {
+        return null;
+    }
+    const type = document.querySelector('input[name="graph-type"]:checked').value;
+    if (type === "edge list") {
+        return parseEdgeList(txt);
+    } else if (type == "parent array") {
+        return parseParentArray(txt);
+    } else {
+        throw new Error(`Invalid graph type: "${graphType.value}"`);
+    }
+}
+
+function parseEdgeList(txt) {
     const lines = txt.split("\n").map(line => line.trim());
     const nodes = new Set();
     const edges = [];
@@ -173,6 +187,14 @@ function parseInput(txt) {
     };
 }
 
+function parseParentArray(txt) {
+    const line = txt.split("\n").map(line => line.trim())[0];
+    const lines = line.split(/\s+/).map((v, idx) => {
+        return `${v} ${idx + 1}`;
+    }).join("\n");
+    return parseEdgeList(lines);
+}
+
 // compression
 
 function compressAndEncode(data) {
@@ -188,6 +210,8 @@ function decodeAndDecompress(base64Data) {
 
 
 // html & stuff
+
+
 
 function updateURL(o) {
     let txt = JSON.stringify(o);
@@ -244,6 +268,9 @@ function collectAndDraw() {
         input: inputBox.value,
         isDirected: inputIsDirected.checked,
     }
+    if (data.input === "") {
+        return;
+    }
     draw(data);
     updateURL(data);
 }
@@ -273,4 +300,10 @@ document.getElementById("copy-url-button").addEventListener("click", async () =>
 
 document.getElementById("zoom-reset-button").addEventListener("click", () => {
     svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity);
+});
+
+graphType.addEventListener("change", () => {
+    const type = document.querySelector('input[name="graph-type"]:checked').value;
+    inputBox.placeholder = type === "edge list" ? "edge list" : "parent array";
+    collectAndDraw();
 });
